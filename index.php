@@ -46,25 +46,28 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
     
     return '
         <div class="todo-item' . ($todo['completed'] ? ' completed' : '') . $subtaskClass . '" data-id="' . $todo['id'] . '" data-parent="' . (isset($todo['parent_id']) ? $todo['parent_id'] : '') . '">
-            <div class="todo-toolbar" id="toolbar-' . $todo['id'] . '">
-                <button class="toolbar-btn" onclick="formatText(\'bold\', ' . $todo['id'] . ')"><strong>B</strong></button>
-                <button class="toolbar-btn" onclick="formatText(\'italic\', ' . $todo['id'] . ')"><em>I</em></button>
-                <button class="toolbar-btn" onclick="insertLink(' . $todo['id'] . ')">🔗</button>
-                <button class="toolbar-btn" onclick="formatText(\'insertUnorderedList\', ' . $todo['id'] . ')">• List</button>
+            <div class="todo-content-wrapper">
+                <div class="todo-toolbar" id="toolbar-' . $todo['id'] . '">
+                    <button class="toolbar-btn" onclick="formatText(\'bold\', ' . $todo['id'] . ')"><strong>B</strong></button>
+                    <button class="toolbar-btn" onclick="formatText(\'italic\', ' . $todo['id'] . ')"><em>I</em></button>
+                    <button class="toolbar-btn" onclick="insertLink(' . $todo['id'] . ')">🔗</button>
+                    <button class="toolbar-btn" onclick="formatText(\'insertUnorderedList\', ' . $todo['id'] . ')">• List</button>
+                </div>
+                <div class="todo-content' . ($todo['completed'] ? ' completed' : '') . '" 
+                     contenteditable="true" 
+                     onfocus="showToolbar(' . $todo['id'] . ')"
+                     onblur="hideToolbar(' . $todo['id'] . '); saveTodoContent(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ', this.innerHTML)">' . $todo['content'] . '</div>
+                ' . $subtaskHtml . '
             </div>
-            <div class="todo-content' . ($todo['completed'] ? ' completed' : '') . '" 
-                 contenteditable="true" 
-                 onfocus="showToolbar(' . $todo['id'] . ')"
-                 onblur="hideToolbar(' . $todo['id'] . '); saveTodoContent(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ', this.innerHTML)">' . $todo['content'] . '</div>
             <div class="todo-actions">
                 <button class="btn btn-sm btn-' . ($todo['completed'] ? 'warning' : 'success') . '" 
-                        onclick="toggleTodo(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')">
-                    ' . ($todo['completed'] ? 'Undo' : 'Complete') . '
+                        onclick="toggleTodo(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')" 
+                        title="' . ($todo['completed'] ? 'Mark as incomplete' : 'Mark as complete') . '">
+                    ' . ($todo['completed'] ? '↶' : '✓') . '
                 </button>
-                ' . (!$isSubtask ? '<button class="add-subtask-btn" onclick="addSubtask(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')">+ Sub</button>' : '') . '
-                <button class="btn btn-sm btn-danger" onclick="deleteTodo(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')">Delete</button>
+                ' . (!$isSubtask ? '<button class="add-subtask-btn" onclick="addSubtask(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')" title="Add subtask">+</button>' : '') . '
+                <button class="btn btn-sm btn-danger" onclick="deleteTodo(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')" title="Delete todo">×</button>
             </div>
-            ' . $subtaskHtml . '
         </div>';
 }
 ?>
@@ -252,6 +255,13 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
             padding: 1rem;
             border-radius: 6px;
             border-left: 4px solid #007bff;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .todo-content-wrapper {
+            flex: 1;
         }
         
         .todo-item.completed {
@@ -353,8 +363,12 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
             padding: 0.25rem 0.5rem;
             border-radius: 3px;
             cursor: pointer;
-            font-size: 0.75rem;
-            margin-left: 0.5rem;
+            font-size: 0.875rem;
+            min-width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .add-subtask-btn:hover {
@@ -363,12 +377,20 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
         
         .todo-actions {
             display: flex;
-            gap: 0.5rem;
+            flex-direction: row;
+            gap: 0.25rem;
+            flex-shrink: 0;
+            align-items: flex-start;
         }
         
         .btn-sm {
-            padding: 0.25rem 0.75rem;
+            padding: 0.25rem 0.5rem;
             font-size: 0.875rem;
+            min-width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .btn-success {
@@ -615,20 +637,22 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
             
             const todoHtml = `
                 <div class="todo-item${parentId ? ' subtask' : ''}" data-id="${todoId}" data-parent="${parentId || ''}">
-                    <div class="todo-toolbar" id="toolbar-${todoId}">
-                        <button class="toolbar-btn" onclick="formatText('bold', ${todoId})"><strong>B</strong></button>
-                        <button class="toolbar-btn" onclick="formatText('italic', ${todoId})"><em>I</em></button>
-                        <button class="toolbar-btn" onclick="insertLink(${todoId})">🔗</button>
-                        <button class="toolbar-btn" onclick="formatText('insertUnorderedList', ${todoId})">• List</button>
+                    <div class="todo-content-wrapper">
+                        <div class="todo-toolbar" id="toolbar-${todoId}">
+                            <button class="toolbar-btn" onclick="formatText('bold', ${todoId})"><strong>B</strong></button>
+                            <button class="toolbar-btn" onclick="formatText('italic', ${todoId})"><em>I</em></button>
+                            <button class="toolbar-btn" onclick="insertLink(${todoId})">🔗</button>
+                            <button class="toolbar-btn" onclick="formatText('insertUnorderedList', ${todoId})">• List</button>
+                        </div>
+                        <div class="todo-content" contenteditable="true" 
+                             onfocus="showToolbar(${todoId})"
+                             onblur="hideToolbar(${todoId}); saveTodoContent('${tabId}', ${todoId}, this.innerHTML)" 
+                             placeholder="Enter your todo..."></div>
                     </div>
-                    <div class="todo-content" contenteditable="true" 
-                         onfocus="showToolbar(${todoId})"
-                         onblur="hideToolbar(${todoId}); saveTodoContent('${tabId}', ${todoId}, this.innerHTML)" 
-                         placeholder="Enter your todo..."></div>
                     <div class="todo-actions">
-                        <button class="btn btn-sm btn-success" onclick="toggleTodo('${tabId}', ${todoId})">Complete</button>
-                        ${!parentId ? `<button class="add-subtask-btn" onclick="addSubtask('${tabId}', ${todoId})">+ Sub</button>` : ''}
-                        <button class="btn btn-sm btn-danger" onclick="deleteTodo('${tabId}', ${todoId})">Delete</button>
+                        <button class="btn btn-sm btn-success" onclick="toggleTodo('${tabId}', ${todoId})" title="Mark as complete">✓</button>
+                        ${!parentId ? `<button class="add-subtask-btn" onclick="addSubtask('${tabId}', ${todoId})" title="Add subtask">+</button>` : ''}
+                        <button class="btn btn-sm btn-danger" onclick="deleteTodo('${tabId}', ${todoId})" title="Delete todo">×</button>
                     </div>
                 </div>
             `;
