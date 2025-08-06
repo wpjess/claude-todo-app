@@ -2,6 +2,8 @@
 
 A simple, elegant PHP todo application built with Claude Code in under 30 minutes.
 
+![Todo App Screenshot](images/screenshot1.png)
+
 ## Features
 - Session-based authentication
 - Tabbed organization system
@@ -9,6 +11,8 @@ A simple, elegant PHP todo application built with Claude Code in under 30 minute
 - Complete/Undo functionality
 - JSON-based persistence
 - AJAX-powered interface
+
+![Todo App Screenshot](images/screenshot2.png)
 
 ## Setup
 1. Clone this repository
