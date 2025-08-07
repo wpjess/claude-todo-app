@@ -60,13 +60,13 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
                 ' . $subtaskHtml . '
             </div>
             <div class="todo-actions">
-                <button class="btn btn-sm btn-' . ($todo['completed'] ? 'warning' : 'success') . '" 
+                <button class="todo-btn todo-btn-complete' . ($todo['completed'] ? ' completed' : '') . '" 
                         onclick="toggleTodo(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')" 
                         title="' . ($todo['completed'] ? 'Mark as incomplete' : 'Mark as complete') . '">
                     ' . ($todo['completed'] ? '↶' : '✓') . '
                 </button>
-                ' . (!$isSubtask ? '<button class="add-subtask-btn" onclick="addSubtask(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')" title="Add subtask">+</button>' : '') . '
-                <button class="btn btn-sm btn-danger" onclick="deleteTodo(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')" title="Delete todo">×</button>
+                ' . (!$isSubtask ? '<button class="todo-btn todo-btn-subtask" onclick="addSubtask(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')" title="Add subtask">+</button>' : '') . '
+                <button class="todo-btn todo-btn-delete" onclick="deleteTodo(\'' . htmlspecialchars($tabId) . '\', ' . $todo['id'] . ')" title="Delete todo">×</button>
             </div>
         </div>';
 }
@@ -86,9 +86,10 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
         }
         
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
             min-height: 100vh;
+            color: #334155;
         }
         
         .login-container {
@@ -96,20 +97,22 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .login-form {
             background: white;
             padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            width: 300px;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 320px;
         }
         
         .login-form h2 {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             text-align: center;
-            color: #333;
+            color: #1e293b;
+            font-weight: 600;
         }
         
         .form-group {
@@ -119,30 +122,40 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #555;
+            color: #475569;
+            font-weight: 500;
+            font-size: 0.875rem;
         }
         
         .form-group input {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
             font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
         .btn {
-            background: #007bff;
+            background: #3b82f6;
             color: white;
             padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s;
         }
         
         .btn:hover {
-            background: #0056b3;
+            background: #2563eb;
         }
         
         .btn-full {
@@ -150,114 +163,141 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
         }
         
         .error {
-            color: #dc3545;
+            color: #dc2626;
             margin-top: 0.5rem;
             text-align: center;
+            font-size: 0.875rem;
         }
         
         .app-container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 1.5rem;
         }
         
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             background: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
         }
         
         .tabs-container {
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border: 1px solid #e2e8f0;
             overflow: hidden;
         }
         
         .tabs-header {
             display: flex;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #e2e8f0;
             align-items: center;
-            padding: 0 1rem;
+            padding: 0 0.75rem;
+            background: #f8fafc;
         }
         
         .tab {
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1rem;
             cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
             position: relative;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
         }
         
         .tab:hover {
-            background: #f8f9fa;
+            background: #f1f5f9;
+            color: #475569;
         }
         
         .tab.active {
-            border-bottom-color: #007bff;
-            background: #f8f9fa;
+            border-bottom-color: #3b82f6;
+            background: white;
+            color: #3b82f6;
         }
         
         .tab-close {
             margin-left: 0.5rem;
-            color: #999;
+            color: #94a3b8;
             cursor: pointer;
             font-weight: bold;
+            font-size: 1rem;
         }
         
         .tab-close:hover {
-            color: #dc3545;
+            color: #ef4444;
         }
         
         .add-tab-btn {
             margin-left: auto;
-            padding: 0.5rem 1rem;
-            background: #28a745;
+            padding: 0.5rem 0.75rem;
+            background: #10b981;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: background 0.2s;
         }
         
         .add-tab-btn:hover {
-            background: #1e7e34;
+            background: #059669;
         }
         
         .tab-content {
-            padding: 2rem;
+            padding: 1.5rem;
             min-height: 400px;
         }
         
         .add-todo-btn {
-            background: #007bff;
+            background: #3b82f6;
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
             cursor: pointer;
             margin-bottom: 1rem;
-            font-size: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s;
         }
         
         .add-todo-btn:hover {
-            background: #0056b3;
+            background: #2563eb;
         }
         
         .todo-item {
-            background: #f8f9fa;
-            margin-bottom: 1rem;
+            background: white;
+            margin-bottom: 0.75rem;
             padding: 1rem;
-            border-radius: 6px;
-            border-left: 4px solid #007bff;
+            border-radius: 8px;
+            border-left: 3px solid #e2e8f0;
             display: flex;
             align-items: flex-start;
-            gap: 1rem;
+            gap: 0.75rem;
+            transition: all 0.2s;
+            border: 1px solid #f1f5f9;
+        }
+        
+        .todo-item:hover {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            border-color: #e2e8f0;
         }
         
         .todo-content-wrapper {
@@ -266,75 +306,77 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
         
         .todo-item.completed {
             opacity: 0.6;
-            border-left-color: #28a745;
+            border-left-color: #10b981;
+            background: #f0fdf4;
         }
         
         .todo-content {
-            min-height: 40px;
+            min-height: 36px;
             padding: 0.5rem;
             border: 1px solid transparent;
-            border-radius: 4px;
+            border-radius: 6px;
             margin-bottom: 0.5rem;
             word-wrap: break-word;
+            font-size: 0.875rem;
+            line-height: 1.5;
         }
         
         .todo-content.completed {
             text-decoration: line-through;
+            color: #6b7280;
         }
         
         .todo-content:focus {
             outline: none;
-            border-color: #007bff;
-            background: white;
+            border-color: #3b82f6;
+            background: #fefefe;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
         
         .todo-toolbar {
             display: none;
             background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
             padding: 0.5rem;
             margin-bottom: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         
         .todo-toolbar.show {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.25rem;
             align-items: center;
         }
         
         .toolbar-btn {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
             padding: 0.25rem 0.5rem;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 0.875rem;
-            transition: background 0.2s;
+            font-size: 0.75rem;
+            transition: all 0.2s;
         }
         
         .toolbar-btn:hover {
-            background: #e9ecef;
+            background: #f3f4f6;
+            border-color: #d1d5db;
         }
         
         .toolbar-btn.active {
-            background: #007bff;
+            background: #3b82f6;
             color: white;
-            border-color: #007bff;
-        }
-        
-        .todo-content {
-            min-height: 60px;
+            border-color: #3b82f6;
         }
         
         .todo-content a {
-            color: #007bff;
+            color: #3b82f6;
             text-decoration: underline;
         }
         
         .todo-content strong {
-            font-weight: bold;
+            font-weight: 600;
         }
         
         .todo-content em {
@@ -342,37 +384,19 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
         }
         
         .todo-content ul, .todo-content ol {
-            margin-left: 1.5rem;
+            margin-left: 1.25rem;
         }
         
         .subtask {
-            margin-left: 2rem;
+            margin-left: 1.5rem;
             margin-top: 0.5rem;
-            border-left: 2px solid #e9ecef;
-            padding-left: 1rem;
+            border-left: 2px solid #e5e7eb;
+            padding-left: 0.75rem;
         }
         
         .subtask .todo-item {
-            border-left: 2px solid #6c757d;
-        }
-        
-        .add-subtask-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 0.25rem 0.5rem;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            min-width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .add-subtask-btn:hover {
-            background: #495057;
+            border-left: 2px solid #9ca3af;
+            background: #f9fafb;
         }
         
         .todo-actions {
@@ -383,39 +407,61 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
             align-items: flex-start;
         }
         
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-            min-width: 28px;
-            height: 28px;
+        .todo-btn {
+            padding: 0.25rem;
+            font-size: 0.75rem;
+            min-width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #f8fafc;
+            color: #64748b;
         }
         
-        .btn-success {
-            background: #28a745;
+        .todo-btn:hover {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
         }
         
-        .btn-success:hover {
-            background: #1e7e34;
+        .todo-btn-complete {
+            color: #10b981;
         }
         
-        .btn-warning {
-            background: #ffc107;
-            color: #212529;
+        .todo-btn-complete:hover {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
         }
         
-        .btn-warning:hover {
-            background: #e0a800;
+        .todo-btn-complete.completed {
+            background: #fbbf24;
+            color: white;
         }
         
-        .btn-danger {
-            background: #dc3545;
+        .todo-btn-complete.completed:hover {
+            background: #f59e0b;
         }
         
-        .btn-danger:hover {
-            background: #c82333;
+        .todo-btn-subtask {
+            color: #6b7280;
+        }
+        
+        .todo-btn-subtask:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        
+        .todo-btn-delete {
+            color: #ef4444;
+        }
+        
+        .todo-btn-delete:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
         }
         
         .hidden {
@@ -428,7 +474,7 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -438,32 +484,53 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
         .modal-content {
             background: white;
             padding: 2rem;
-            border-radius: 8px;
-            width: 300px;
+            border-radius: 12px;
+            width: 320px;
             position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         
         .modal-content h3 {
             margin-bottom: 1rem;
+            color: #1e293b;
+            font-weight: 600;
         }
         
         .modal-close {
             position: absolute;
             top: 10px;
             right: 15px;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
-            color: #999;
+            color: #9ca3af;
             line-height: 1;
         }
         
         .modal-close:hover {
-            color: #333;
+            color: #374151;
         }
         
         .loading {
             opacity: 0.5;
             pointer-events: none;
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.125rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .empty-state p {
+            font-size: 0.875rem;
         }
     </style>
 </head>
@@ -484,7 +551,7 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
                 <?php if (isset($loginError)): ?>
                     <div class="error"><?php echo htmlspecialchars($loginError); ?></div>
                 <?php endif; ?>
-                <div style="margin-top: 1rem; font-size: 0.9rem; color: #666; text-align: center;">
+                <div style="margin-top: 1rem; font-size: 0.875rem; color: #6b7280; text-align: center;">
                     Demo credentials: admin / password123
                 </div>
             </form>
@@ -492,7 +559,7 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
     <?php else: ?>
         <div class="app-container">
             <div class="header">
-                <h1>Claude To-Do App</h1>
+                <h1>Todo App</h1>
                 <a href="?logout=1" class="btn">Logout</a>
             </div>
             
@@ -513,9 +580,16 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
                     <div class="tab-content<?php echo array_key_first($todos['tabs']) !== $tabId ? ' hidden' : ''; ?>" id="tab-<?php echo htmlspecialchars($tabId); ?>">
                         <button class="add-todo-btn" onclick="addTodo('<?php echo htmlspecialchars($tabId); ?>')">+ Add Todo</button>
                         <div id="todos-<?php echo htmlspecialchars($tabId); ?>">
-                            <?php foreach ($tab['todos'] as $todo): ?>
-                                <?php echo renderTodo($todo, $tabId); ?>
-                            <?php endforeach; ?>
+                            <?php if (empty($tab['todos'])): ?>
+                                <div class="empty-state">
+                                    <h3>No todos yet</h3>
+                                    <p>Click "Add Todo" to get started</p>
+                                </div>
+                            <?php else: ?>
+                                <?php foreach ($tab['todos'] as $todo): ?>
+                                    <?php echo renderTodo($todo, $tabId); ?>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -531,7 +605,7 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
                     <input type="text" id="tabName" placeholder="Enter tab name">
                 </div>
                 <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                    <button class="btn" onclick="hideAddTabModal()">Cancel</button>
+                    <button class="btn" onclick="hideAddTabModal()" style="background: #6b7280;">Cancel</button>
                     <button class="btn" onclick="createTab()">Create</button>
                 </div>
             </div>
@@ -632,6 +706,12 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
         }
 
         function addTodo(tabId, parentId = null) {
+            // Hide empty state if it exists
+            const emptyState = document.querySelector(`#tab-${tabId} .empty-state`);
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
             const todosContainer = document.getElementById(`todos-${tabId}`);
             const todoId = todoCounter++;
             
@@ -650,9 +730,9 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
                              placeholder="Enter your todo..."></div>
                     </div>
                     <div class="todo-actions">
-                        <button class="btn btn-sm btn-success" onclick="toggleTodo('${tabId}', ${todoId})" title="Mark as complete">✓</button>
-                        ${!parentId ? `<button class="add-subtask-btn" onclick="addSubtask('${tabId}', ${todoId})" title="Add subtask">+</button>` : ''}
-                        <button class="btn btn-sm btn-danger" onclick="deleteTodo('${tabId}', ${todoId})" title="Delete todo">×</button>
+                        <button class="todo-btn todo-btn-complete" onclick="toggleTodo('${tabId}', ${todoId})" title="Mark as complete">✓</button>
+                        ${!parentId ? `<button class="todo-btn todo-btn-subtask" onclick="addSubtask('${tabId}', ${todoId})" title="Add subtask">+</button>` : ''}
+                        <button class="todo-btn todo-btn-delete" onclick="deleteTodo('${tabId}', ${todoId})" title="Delete todo">×</button>
                     </div>
                 </div>
             `;
@@ -775,20 +855,18 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
             .then(data => {
                 if (data.success) {
                     const content = todoItem.querySelector('.todo-content');
-                    const button = todoItem.querySelector('.btn-success, .btn-warning');
+                    const button = todoItem.querySelector('.todo-btn-complete');
                     
                     if (!isCompleted) {
                         todoItem.classList.add('completed');
                         content.classList.add('completed');
-                        button.classList.remove('btn-success');
-                        button.classList.add('btn-warning');
-                        button.textContent = 'Undo';
+                        button.classList.add('completed');
+                        button.textContent = '↶';
                     } else {
                         todoItem.classList.remove('completed');
                         content.classList.remove('completed');
-                        button.classList.remove('btn-warning');
-                        button.classList.add('btn-success');
-                        button.textContent = 'Complete';
+                        button.classList.remove('completed');
+                        button.textContent = '✓';
                     }
                 }
             })
@@ -815,6 +893,17 @@ function renderTodo($todo, $tabId, $isSubtask = false) {
             .then(data => {
                 if (data.success) {
                     document.querySelector(`[data-id="${todoId}"]`).remove();
+                    
+                    // Show empty state if no todos remain
+                    const todosContainer = document.getElementById(`todos-${tabId}`);
+                    if (todosContainer.children.length === 0) {
+                        todosContainer.innerHTML = `
+                            <div class="empty-state">
+                                <h3>No todos yet</h3>
+                                <p>Click "Add Todo" to get started</p>
+                            </div>
+                        `;
+                    }
                 }
             })
             .catch(error => console.error('Error:', error));
